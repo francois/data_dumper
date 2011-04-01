@@ -9,42 +9,44 @@ h2. Usage
 
 You're knee deep in a debugger session, and you can't understand why something's wrong. You wish you could fire up your application against the test database, but sadly, the process which is running the tests is within a transaction, and thus the actual data is opaque. What can you do?
 
-    # Somewhere deep in your tests
-    test "the frobble touches the widget" do
-      debugger
-      assert_equal 42, frobble.widget_id
-    end
+<pre><code># Somewhere deep in your tests
+test "the frobble touches the widget" do
+  debugger
+  assert_equal 42, frobble.widget_id
+end
+</code></pre>
 
 You've been on this <code>assert_equal</code> call for the past hour wondering...:
 
-    [814, 823] in test/unit/widget_test.rb
-       814          frobble.save!
-       815        end
-       816
-       817        test "the frobble touches the widget" do
-       818          debugger
-    => 819          assert_equal 42, frobble.widget_id
-       820        end
-       821
-       822        test "the widget touched the frobble in turn" do
-       823          assert widget.touched_by_frobble?
-    test/unit/widget_test.rb:819
-    => 819          assert_equal 42, frobble.widget_id
-    (rdb:112)
+<pre><code>[814, 823] in test/unit/widget_test.rb
+   814          frobble.save!
+   815        end
+   816
+   817        test "the frobble touches the widget" do
+   818          debugger
+=> 819          assert_equal 42, frobble.widget_id
+   820        end
+   821
+   822        test "the widget touched the frobble in turn" do
+   823          assert widget.touched_by_frobble?
+test/unit/widget_test.rb:819
+=> 819          assert_equal 42, frobble.widget_id
+(rdb:112)
+</code></pre>
 
 Luckily, you have the DataDumper gem already declared in your Gemfile (if not, declare it, <code>bundle install</code>, then run your tests again), and type:
 
-    (rdb:112) File.mkdir(Rails.root + "dump")
-    (rdb:113) DataDumper.dump(Rails.root + "dump")
+<pre><code>(rdb:112) File.mkdir(Rails.root + "dump")
+(rdb:113) DataDumper.dump(Rails.root + "dump")</code></pre>
 
 Then, finish your failing tests, and from the trusty command line:
 
-    $ rails console
-    > require "data_dumper"
-    > DataDumper.load(Rails.root + "dump")
-    > exit
+<pre><code>$ rails console
+> require "data_dumper"
+> DataDumper.load(Rails.root + "dump")
+> exit
 
-    $ rails server
+$ rails server</code></pre>
 
 Any and all data from your test database will be loaded in your development environment. You can now explore your model with your trusty application, to find out what's really going on.
 
